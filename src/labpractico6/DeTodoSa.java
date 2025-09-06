@@ -74,6 +74,11 @@ public class DeTodoSa extends javax.swing.JFrame {
         jMenu2.add(jMnombre);
 
         jMprecio.setText("Por precio");
+        jMprecio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMprecioActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMprecio);
 
         jMrubro.setText("Por rubro");
@@ -111,6 +116,12 @@ public class DeTodoSa extends javax.swing.JFrame {
        escritorio.add(gestion);
        gestion.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMprecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMprecioActionPerformed
+        ConsultaPorPrecio consultaPorPrecio= new ConsultaPorPrecio();
+        escritorio.add(consultaPorPrecio);
+        consultaPorPrecio.setVisible(true);
+    }//GEN-LAST:event_jMprecioActionPerformed
 
     /**
      * @param args the command line arguments
