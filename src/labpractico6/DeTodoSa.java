@@ -36,6 +36,9 @@ public class DeTodoSa extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMnombre = new javax.swing.JMenuItem();
+        jMprecio = new javax.swing.JMenuItem();
+        jMrubro = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
 
         jMenuItem1.setText("jMenuItem1");
@@ -66,6 +69,16 @@ public class DeTodoSa extends javax.swing.JFrame {
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Consulta");
+
+        jMnombre.setText("Por nombre");
+        jMenu2.add(jMnombre);
+
+        jMprecio.setText("Por precio");
+        jMenu2.add(jMprecio);
+
+        jMrubro.setText("Por rubro");
+        jMenu2.add(jMrubro);
+
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Salir");
@@ -142,5 +155,8 @@ public class DeTodoSa extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMnombre;
+    private javax.swing.JMenuItem jMprecio;
+    private javax.swing.JMenuItem jMrubro;
     // End of variables declaration//GEN-END:variables
 }

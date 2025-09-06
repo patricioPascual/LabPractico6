@@ -28,6 +28,23 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Consulta"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="jMnombre">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Por nombre"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMprecio">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Por precio"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMrubro">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Por rubro"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu3">
           <Properties>
