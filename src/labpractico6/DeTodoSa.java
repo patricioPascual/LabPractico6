@@ -4,18 +4,22 @@
  */
 package labpractico6;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.util.TreeMap;
+import javax.swing.ImageIcon;
+import javax.swing.JInternalFrame;
 
 /**
  *
  * @author patri
  */
 public class DeTodoSa extends javax.swing.JFrame {
-
+   
     /**
      * Creates new form DeTodoSa
      */
-      static TreeMap<Integer,Producto> mercaderia;
+    static TreeMap<Integer,Producto> mercaderia;
     public DeTodoSa() {
         initComponents();
         mercaderia= new TreeMap<Integer,Producto>();
@@ -31,17 +35,27 @@ public class DeTodoSa extends javax.swing.JFrame {
     private void initComponents() {
 
         jMenuItem1 = new javax.swing.JMenuItem();
-        escritorio = new javax.swing.JPanel();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        ImageIcon icono = new ImageIcon(getClass().getResource("/Resource/fondo1.jpg"));
+        Image fondo1 = icono.getImage();
+        escritorio = new javax.swing.JDesktopPane() {
+            public void paintComponent(Graphics g) {
+                g.drawImage(fondo1, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        menuAdministracion = new javax.swing.JMenu();
+        menuModificacion = new javax.swing.JMenuItem();
+        menuConsulta = new javax.swing.JMenu();
         jMnombre = new javax.swing.JMenuItem();
         jMprecio = new javax.swing.JMenuItem();
         jMrubro = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        menuOut = new javax.swing.JMenu();
+        menuSalir = new javax.swing.JMenuItem();
 
         jMenuItem1.setText("jMenuItem1");
+
+        jMenuItem3.setText("jMenuItem3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -49,29 +63,34 @@ public class DeTodoSa extends javax.swing.JFrame {
         escritorio.setLayout(escritorioLayout);
         escritorioLayout.setHorizontalGroup(
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 480, Short.MAX_VALUE)
+            .addGap(0, 807, Short.MAX_VALUE)
         );
         escritorioLayout.setVerticalGroup(
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 401, Short.MAX_VALUE)
+            .addGap(0, 536, Short.MAX_VALUE)
         );
 
-        jMenu1.setText("Administracion");
+        menuAdministracion.setText("Administracion");
 
-        jMenuItem2.setText("Agregar/Eliminar/Modificar");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        menuModificacion.setText("Agregar/Eliminar/Modificar");
+        menuModificacion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                menuModificacionActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem2);
+        menuAdministracion.add(menuModificacion);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(menuAdministracion);
 
-        jMenu2.setText("Consulta");
+        menuConsulta.setText("Consulta");
 
         jMnombre.setText("Por nombre");
-        jMenu2.add(jMnombre);
+        jMnombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMnombreActionPerformed(evt);
+            }
+        });
+        menuConsulta.add(jMnombre);
 
         jMprecio.setText("Por precio");
         jMprecio.addActionListener(new java.awt.event.ActionListener() {
@@ -79,15 +98,29 @@ public class DeTodoSa extends javax.swing.JFrame {
                 jMprecioActionPerformed(evt);
             }
         });
-        jMenu2.add(jMprecio);
+        menuConsulta.add(jMprecio);
 
         jMrubro.setText("Por rubro");
-        jMenu2.add(jMrubro);
+        jMrubro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMrubroActionPerformed(evt);
+            }
+        });
+        menuConsulta.add(jMrubro);
 
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(menuConsulta);
 
-        jMenu3.setText("Salir");
-        jMenuBar1.add(jMenu3);
+        menuOut.setText("Salir");
+
+        menuSalir.setText("Salir");
+        menuSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSalirActionPerformed(evt);
+            }
+        });
+        menuOut.add(menuSalir);
+
+        jMenuBar1.add(menuOut);
 
         setJMenuBar(jMenuBar1);
 
@@ -97,32 +130,72 @@ public class DeTodoSa extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(escritorio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(escritorio)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(escritorio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(30, 30, 30))
+                .addComponent(escritorio)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-       GestionDeProductos gestion= new GestionDeProductos();
-       escritorio.add(gestion);
-       gestion.setVisible(true);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+   
+    private void menuModificacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuModificacionActionPerformed
+        GestionDeProductos gestion = new GestionDeProductos();
+        escritorio.add(gestion);
+        gestion.setVisible(true);
+        centrarInternalFrame(gestion);
+    }//GEN-LAST:event_menuModificacionActionPerformed
 
     private void jMprecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMprecioActionPerformed
-        ConsultaPorPrecio consultaPorPrecio= new ConsultaPorPrecio();
+        ConsultaPorPrecio consultaPorPrecio = new ConsultaPorPrecio();
         escritorio.add(consultaPorPrecio);
         consultaPorPrecio.setVisible(true);
+        centrarInternalFrame(consultaPorPrecio);
     }//GEN-LAST:event_jMprecioActionPerformed
 
+    private void menuSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalirActionPerformed
+        int opcion = javax.swing.JOptionPane.showConfirmDialog(
+                this,
+                "¿Seguro que querés Salir?",
+                "Confirmar Salida",
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        
+        if (opcion == javax.swing.JOptionPane.YES_OPTION) {
+            
+            this.dispose();
+            
+            
+        }
+    }//GEN-LAST:event_menuSalirActionPerformed
+
+    private void jMnombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMnombreActionPerformed
+        VentanaPorNombre vistaNombre = new VentanaPorNombre();
+        escritorio.add(vistaNombre);
+        vistaNombre.setVisible(true);
+        centrarInternalFrame(vistaNombre);
+    }//GEN-LAST:event_jMnombreActionPerformed
+
+    private void jMrubroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMrubroActionPerformed
+        ConsultaPorRubro vistaRubro = new ConsultaPorRubro();
+        escritorio.add(vistaRubro);
+        vistaRubro.setVisible(true);
+        centrarInternalFrame(vistaRubro);
+    }//GEN-LAST:event_jMrubroActionPerformed
+
+    private void centrarInternalFrame(JInternalFrame internalFrame) {
+        // Centrar el internal frame en el escritorio
+        int x = (escritorio.getWidth() - internalFrame.getWidth()) / 2;
+        int y = (escritorio.getHeight() - internalFrame.getHeight()) / 2;
+        internalFrame.setLocation(x, y);
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -159,15 +232,17 @@ public class DeTodoSa extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel escritorio;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
+    private javax.swing.JDesktopPane escritorio;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMnombre;
     private javax.swing.JMenuItem jMprecio;
     private javax.swing.JMenuItem jMrubro;
+    private javax.swing.JMenu menuAdministracion;
+    private javax.swing.JMenu menuConsulta;
+    private javax.swing.JMenuItem menuModificacion;
+    private javax.swing.JMenu menuOut;
+    private javax.swing.JMenuItem menuSalir;
     // End of variables declaration//GEN-END:variables
 }
