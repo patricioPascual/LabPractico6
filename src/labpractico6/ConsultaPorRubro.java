@@ -154,20 +154,6 @@ public class ConsultaPorRubro extends javax.swing.JInternalFrame {
                modeloTabla.addRow(fila);
            }
        }
-        
-        /*for (Producto producto : listaProductos) {
-            if (rubroSeleccionado.equals("Todos") || 
-                producto.getCategoria().equalsIgnoreCase(rubroSeleccionado)) {
-                
-                Object[] fila = {
-                    producto.getNombre(),
-                    producto.getPrecio(),
-                    producto.getStock(),
-                    producto.getCategoria()
-                };
-                modeloTabla.addRow(fila);
-            }
-        }*/
     }
     
     

@@ -4,19 +4,22 @@
  */
 package labpractico6;
 
+import java.util.Map;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author Franco
  */
 public class VentanaPorNombre extends javax.swing.JInternalFrame {
-
+    private DefaultTableModel modeloTabla;
     /**
      * Creates new form VentanaPorNombre
      */
     public VentanaPorNombre() {
         initComponents();
+        inicializarTabla();
     }
 
     /**
@@ -45,6 +48,11 @@ public class VentanaPorNombre extends javax.swing.JInternalFrame {
         jTexto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextoActionPerformed(evt);
+            }
+        });
+        jTexto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextoKeyTyped(evt);
             }
         });
 
@@ -125,6 +133,43 @@ public class VentanaPorNombre extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void inicializarTabla() {
+        modeloTabla = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        modeloTabla.addColumn("Codigo");
+        modeloTabla.addColumn("Nombre");
+        modeloTabla.addColumn("Precio");
+        modeloTabla.addColumn("Categoría");
+        modeloTabla.addColumn("Stock");
+        
+        jTListname.setModel(modeloTabla);
+    }
+    
+     private void buscarPorNombre() {
+        String buscado = jTexto.getText();
+        
+        modeloTabla.setRowCount(0);
+
+        for(Map.Entry <Integer, Producto> aux : DeTodoSa.mercaderia.entrySet()){
+           
+           if(aux.getValue().getNombre().equalsIgnoreCase(buscado)){
+               String[] fila={
+                   aux.getKey().toString(),
+                   aux.getValue().getNombre(),
+                   String.valueOf(aux.getValue().getPrecio()),
+                   aux.getValue().getCategoria(),
+                   String.valueOf(aux.getValue().getStock())
+               };
+               modeloTabla.addRow(fila);
+           }
+       }
+    }
+        
     private void jTextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextoActionPerformed
         String texto = jTexto.getText().trim();
         
@@ -136,6 +181,10 @@ public class VentanaPorNombre extends javax.swing.JInternalFrame {
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void jTextoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextoKeyTyped
+        buscarPorNombre();
+    }//GEN-LAST:event_jTextoKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
