@@ -227,42 +227,216 @@ public class GestionDeProductos extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtCodigoActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-     
-       
         DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
-        String categoria= comboCategoria.getSelectedItem().toString();
-        String nombre= txtNombre.getText();
-        int stock=Integer.parseInt(txtStock.getText());
-        Double precio= Double.parseDouble(txtPrecio.getText());
-        int codigo= Integer.parseInt(txtCodigo.getText());
+        // Obtener y normalizar entradas de datos null, ya que se rompia al no ingresar nada...
+        //!= null ?, sirve para la comprobación de datos no nulo, lo recomiendo para validaciones siempre..
+        String categoria = comboCategoria.getSelectedItem() != null ? comboCategoria.getSelectedItem().toString().trim() : "";
+        String nombre   = txtNombre.getText() != null ? txtNombre.getText().trim() : "";
+        String codigoTxt= txtCodigo.getText() != null ? txtCodigo.getText().trim() : "";
+        String stockTxt = txtStock.getText() != null ? txtStock.getText().trim() : "";
+        String precioTxt= txtPrecio.getText() != null ? txtPrecio.getText().trim() : "";
+
+        // Validacion para seleccion de categoria
+        if (categoria.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione una categoría válida.", "Error", JOptionPane.ERROR_MESSAGE);
+            comboCategoria.requestFocus();
+            return;
+        }
         
-        Producto nuevo = new Producto(nombre,precio,stock,categoria);
-      if(DeTodoSa.mercaderia.containsKey(codigo)){
-          JOptionPane.showMessageDialog(this, "El codigo ya exuste");
-      }else{
-        DeTodoSa.mercaderia.put(codigo, nuevo);
+        if (nombre.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese el nombre del producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        txtNombre.requestFocus();
+        return;
+        }
         
+        if (codigoTxt.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese el código del producto.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtCodigo.requestFocus();
+            return;
+        }
         
-        String[] fila={
-            nombre,
-            txtCodigo.getText(),
-            txtStock.getText(),
-            txtPrecio.getText(),
-            categoria
+        if (stockTxt.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese el stock.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtStock.requestFocus();
+            return;
+        }
+        
+        if (precioTxt.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese el precio.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtPrecio.requestFocus();
+            return;
+    }
+        // Normalizo el  formato del precio (acepta coma o punto) ya que los profes pueden ingresar numeros con comas o puntos
+        precioTxt = precioTxt.replace(',', '.');
+        int codigo;
+        int stock;
+        double precio;
+
+        // Parseo y validaciones numéricas con su respectivo mensaje...
+        try {
+            codigo = Integer.parseInt(codigoTxt);
+            if (codigo <= 0) {
+                JOptionPane.showMessageDialog(this, "El código debe ser un número entero positivo.", "Error", JOptionPane.ERROR_MESSAGE);
+                txtCodigo.requestFocus();
+                return;
+            }
+        
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Código inválido. Ingrese un número entero (ej: 123).", "Error", JOptionPane.ERROR_MESSAGE);
+            txtCodigo.requestFocus();
+            return;
+        }
+        
+        try {
+            stock = Integer.parseInt(stockTxt);
+            if (stock < 0) {
+                JOptionPane.showMessageDialog(this, "El stock no puede ser negativo.", "Error", JOptionPane.ERROR_MESSAGE);
+                txtStock.requestFocus();
+                return;
             
-        };
-        modelo.addRow(fila);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Stock inválido. Ingrese un número entero (ej: 10).", "Error", JOptionPane.ERROR_MESSAGE);
+            txtStock.requestFocus();
+            return;
+        }
+        
+        try {
+            precio = Double.parseDouble(precioTxt);
+            if (precio < 0) {
+                JOptionPane.showMessageDialog(this, "El precio no puede ser negativo.", "Error", JOptionPane.ERROR_MESSAGE);
+                txtPrecio.requestFocus();
+                return;
+            }
+        
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Precio inválido. Ingrese un número (ej: 123.45).", "Error", JOptionPane.ERROR_MESSAGE);
+            txtPrecio.requestFocus();
+            return;
+        }
+
+        // Para verificar existencia de código antes de agregar
+        if (DeTodoSa.mercaderia.containsKey(codigo)) {
+            JOptionPane.showMessageDialog(this, "El código ya existe.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            txtCodigo.requestFocus();
+            return;
+        }
+
+        // Para intentar crear y agregar el producto
+        try {
+            Producto nuevo = new Producto(nombre, precio, stock, categoria);
+            DeTodoSa.mercaderia.put(codigo, nuevo);
+            
+            String[] fila = {
+                nombre,
+                String.valueOf(codigo),
+                String.valueOf(stock),
+                String.format("%.2f", precio),
+                categoria
+            };
+            modelo.addRow(fila);
+            JOptionPane.showMessageDialog(this, "Producto agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            // Para limpiar campos después de agregar
+            txtNombre.setText("");
+            txtCodigo.setText("");
+            txtStock.setText("");
+            txtPrecio.setText("");
+            comboCategoria.setSelectedIndex(0); // o -1 si no quieres seleccionar nada
+        
+        } catch (Exception ex) {
+        // Capturo cualquier excepción inesperada y lo informo..
+        JOptionPane.showMessageDialog(this, "Error al agregar el producto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+
     }//GEN-LAST:event_btnAgregarActionPerformed
-    }
+  }
     private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
+         DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
+         try {
+             int selectedRow = tabla.getSelectedRow();
+             String codigoTxt;
+
+            // Si hay una fila seleccionada, toma el código de la tabla................
+            if (selectedRow != -1) {
+                Object val = modelo.getValueAt(selectedRow, 1); // columna 1 = Codigo
+                codigoTxt = val != null ? val.toString().trim() : "";
+            } else {
+                codigoTxt = txtCodigo.getText() != null ? txtCodigo.getText().trim() : "";
+            }
+
+             // Validación: para campo vacío, ya que se rompia antes...
+             if (codigoTxt.isEmpty()) {
+                 JOptionPane.showMessageDialog(this, "No hay código para borrar. Seleccione una fila o ingrese el código a borrar.", "Error", JOptionPane.ERROR_MESSAGE);
+                 if (selectedRow == -1) {
+                     txtCodigo.requestFocus();
+                 } else {
+                     tabla.requestFocus();
+                 }
+                 return;
+             }
+                
+            // Parseo seguro del código para una mejor validación
+            final int codigo;
+            try {
+                codigo = Integer.parseInt(codigoTxt);
+                if (codigo <= 0) {
+                    JOptionPane.showMessageDialog(this, "El código debe ser un número entero positivo.", "Error", JOptionPane.ERROR_MESSAGE);
+                    txtCodigo.requestFocus();
+                    return;
+                }
+            
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(this, "Código inválido. Ingrese un número entero (ej: 123).", "Error", JOptionPane.ERROR_MESSAGE);
+                txtCodigo.requestFocus();
+                return;
+            }
+
+            // Verificar existencia del producto...
+            if (!DeTodoSa.mercaderia.containsKey(codigo)) {
+                JOptionPane.showMessageDialog(this, "No existe un producto con el código indicado.", "Información", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            // Confirmación de borrado
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Está seguro que desea borrar el producto con código " + codigo + "?",
+                "Confirmar borrado",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return; // el usuario canceló
+            }
+
+            // Borro el mapa (sin iterar sobre el entrySet para evitar ConcurrentModificationException que me paso recien....
+            DeTodoSa.mercaderia.remove(codigo);
+
+            // Actualizo la tabla (con actualizarTabla() que reconstruye desde el mapa, usarla)
+            // actualizarTabla();
            
-        int aBorrar= Integer.parseInt(txtCodigo.getText());
-        for(Map.Entry<Integer,Producto> aux : DeTodoSa.mercaderia.entrySet() ){
-          if(aux.getKey().equals(aBorrar)){
-              DeTodoSa.mercaderia.remove(aux);
-          }
-            actualizarTabla();
-    }
+            if (selectedRow != -1) {
+                modelo.removeRow(selectedRow);
+            } else {
+           // Si no había selección, reconstruyo de nuevo la tabla desde el mapa para asegurar consistencia y no me cancele el anterior que cree como recien......
+           actualizarTabla();
+            }
+
+            // Para limpiar campos y quitar selección
+            txtCodigo.setText("");
+            txtNombre.setText("");
+            txtStock.setText("");
+            txtPrecio.setText("");
+            comboCategoria.setSelectedIndex(0);
+            tabla.clearSelection();
+
+            JOptionPane.showMessageDialog(this, "Producto borrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception ex) {
+            // Para capturar cualquier excepción inesperada
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al borrar el producto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
     }//GEN-LAST:event_btnBorrarActionPerformed
 
     private void tablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMouseClicked
@@ -281,30 +455,173 @@ public class GestionDeProductos extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tablaMouseClicked
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-          
-        DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
-        String categoria= comboCategoria.getSelectedItem().toString();
-        String nombre= txtNombre.getText();
-        int stock=Integer.parseInt(txtStock.getText());
-        Double precio= Double.parseDouble(txtPrecio.getText());
-        int codigo= Integer.parseInt(txtCodigo.getText());
-        
-        Producto nuevo = new Producto(nombre,precio,stock,categoria);
-     
-        DeTodoSa.mercaderia.put(codigo, nuevo);
-        
-        
-        String[] fila={
-            nombre,
-            txtCodigo.getText(),
-            txtStock.getText(),
-            txtPrecio.getText(),
-            categoria
-            
-        };
-        
-        modelo.addRow(fila);
-        actualizarTabla();                               
+    DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
+    // Recordar utilizar siempre != null ? en validaciones, para controlar los datos vacios.
+    
+    String categoria = comboCategoria.getSelectedItem() != null ? comboCategoria.getSelectedItem().toString().trim() : "";
+    String nombre   = txtNombre.getText() != null ? txtNombre.getText().trim() : "";
+    String codigoTxt= txtCodigo.getText() != null ? txtCodigo.getText().trim() : "";
+    String stockTxt = txtStock.getText() != null ? txtStock.getText().trim() : "";
+    String precioTxt= txtPrecio.getText() != null ? txtPrecio.getText().trim() : "";
+
+    
+    if (categoria.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Seleccione una categoría válida.", "Error", JOptionPane.ERROR_MESSAGE);
+        comboCategoria.requestFocus();
+        return;
+    }
+    
+    if (nombre.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese el nombre del producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        txtNombre.requestFocus();
+        return;
+    }
+    
+    if (codigoTxt.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese el código del producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        txtCodigo.requestFocus();
+        return;
+    }
+    
+    if (stockTxt.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese el stock.", "Error", JOptionPane.ERROR_MESSAGE);
+        txtStock.requestFocus();
+        return;
+    }
+    
+    if (precioTxt.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese el precio.", "Error", JOptionPane.ERROR_MESSAGE);
+        txtPrecio.requestFocus();
+        return;
+    }
+    
+    //Para coma/punto en precio
+    precioTxt = precioTxt.replace(',', '.');
+    
+    int codigo, stock;
+    double precio;
+
+        // Parseo y validaciones numéricas
+    try {
+        codigo = Integer.parseInt(codigoTxt);
+        if (codigo <= 0) {
+            JOptionPane.showMessageDialog(this, "El código debe ser un número entero positivo.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtCodigo.requestFocus();
+            return;
+        }
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Código inválido. Ingrese un número entero (ej: 123).", "Error", JOptionPane.ERROR_MESSAGE);
+        txtCodigo.requestFocus();
+        return;
+    }
+
+    try {
+        stock = Integer.parseInt(stockTxt);
+        if (stock < 0) {
+            JOptionPane.showMessageDialog(this, "El stock no puede ser negativo.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtStock.requestFocus();
+            return;
+        }
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Stock inválido. Ingrese un número entero (ej: 10).", "Error", JOptionPane.ERROR_MESSAGE);
+        txtStock.requestFocus();
+        return;
+    }
+
+    try {
+        precio = Double.parseDouble(precioTxt);
+        if (precio < 0) {
+            JOptionPane.showMessageDialog(this, "El precio no puede ser negativo.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtPrecio.requestFocus();
+            return;
+        }
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Precio inválido. Ingrese un número (ej: 123.45).", "Error", JOptionPane.ERROR_MESSAGE);
+        txtPrecio.requestFocus();
+        return;
+    }
+
+    int selectedRow = tabla.getSelectedRow();
+    Integer originalCodigo = null;
+
+    try {
+        // Si hay fila seleccionada, obtener el código original de esa fila
+        if (selectedRow != -1) {
+            Object val = modelo.getValueAt(selectedRow, 1); // columna 1 = Codigo
+            if (val != null) {
+                try {
+                    originalCodigo = Integer.parseInt(val.toString());
+                } catch (NumberFormatException nfe) {
+                    originalCodigo = null;
+                }
+            }
+        }
+
+        // Si no hay selección, intentar buscar una fila por el código ingresado
+        if (selectedRow == -1) {
+            for (int i = 0; i < modelo.getRowCount(); i++) {
+                Object val = modelo.getValueAt(i, 1);
+                if (val != null && val.toString().equals(String.valueOf(codigo))) {
+                    selectedRow = i;
+                    originalCodigo = codigo; // coincidente
+                    break;
+                }
+            }
+        }
+
+            // Si no encontramos ninguna fila para modificar, avisar al usuario
+        if (selectedRow == -1 && (originalCodigo == null || !DeTodoSa.mercaderia.containsKey(codigo))) {
+            JOptionPane.showMessageDialog(this, "No hay ningún producto seleccionado ni existe un producto con ese código. Seleccione una fila o ingrese el código de un producto existente.", "Información", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+            // Si el usuario cambió el código y el nuevo código ya existe en mercaderia (y no es el mismo producto), impedir duplicado
+        if (originalCodigo != null && codigo != originalCodigo && DeTodoSa.mercaderia.containsKey(codigo)) {
+            JOptionPane.showMessageDialog(this, "El nuevo código ingresado ya corresponde a otro producto. Elija un código distinto.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtCodigo.requestFocus();
+            return;
+        }
+
+        // Preparar el objeto Producto actualizado
+        Producto actualizado = new Producto(nombre, precio, stock, categoria);
+
+        // Actualizar el mapa DeTodoSa.mercaderia
+        if (originalCodigo != null) {
+            // Si se cambió el código, eliminar la entrada vieja y poner la nueva
+            if (codigo != originalCodigo) {
+                DeTodoSa.mercaderia.remove(originalCodigo);
+                DeTodoSa.mercaderia.put(codigo, actualizado);
+            } else {
+                // mismo código -> reemplazar
+                DeTodoSa.mercaderia.put(codigo, actualizado);
+            }
+        } else {
+            // originalCodigo == null pero hay una fila detectada por código...  es por si falla el anterior if mas de todo...
+            DeTodoSa.mercaderia.put(codigo, actualizado);
+        }
+
+        // Para actualizar la fila de la tabla (no agregar una nueva)
+        modelo.setValueAt(nombre, selectedRow, 0); // Nombre
+        modelo.setValueAt(String.valueOf(codigo), selectedRow, 1); // Codigo
+        modelo.setValueAt(String.valueOf(stock), selectedRow, 2); // Stock
+        modelo.setValueAt(String.format("%.2f", precio), selectedRow, 3); // Precio
+        modelo.setValueAt(categoria, selectedRow, 4); // Categoria
+
+        JOptionPane.showMessageDialog(this, "Producto modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        // Opcional: limpiar campos y quitar selección
+        txtNombre.setText("");
+        txtCodigo.setText("");
+        txtStock.setText("");
+        txtPrecio.setText("");
+        comboCategoria.setSelectedIndex(0);
+        tabla.clearSelection();
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Ocurrió un error al modificar el producto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+    }
+                              
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
